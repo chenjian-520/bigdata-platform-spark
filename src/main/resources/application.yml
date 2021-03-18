@@ -1,0 +1,43 @@
+server:
+  port: 8090  #配置端口
+  session-timeout: 30
+  tomcat.max-threads: 0
+  tomcat.uri-encoding: UTF-8
+
+spring:
+  datasource:  #数据库配置
+    url : jdbc:mysql://localhost:3306/newbirds
+    username : root
+    password : mymysql
+    driverClassName : com.mysql.jdbc.Driver
+  kafka:
+    bootstrap-servers: 127.0.0.1:9092
+    producer:
+      #设置大于0的值，则客户端会将发送失败的记录重新发送
+      retries: 0
+      # 每次批量发送消息的数量
+      batch-size: 5
+      # 缓存容量
+      buffer-memory: 33554432
+      # 指定消息key和消息体的编解码方式 UTF-8
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        linger.ms: 1
+    consumer:
+      enable-auto-commit: false
+      auto-commit-interval: 100ms
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        session.timeout.ms: 15000
+
+kafka:
+  topic:
+    #主题消费分组
+    group-id: topicGroupId
+    #订阅的主题
+    topic-name:
+      - topic1
+      - topic2
+      - topic3
