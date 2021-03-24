@@ -8,14 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Function;
 
+/**
+ * 启动sparkjob的javaAPI方法。原理百度
+ */
 public class SparkClient {
 
     /**
@@ -30,7 +30,7 @@ public class SparkClient {
     /**
      * 属性
      */
-    private static Properties prop = new Properties();;
+    private static ResourceBundle resourceBundle = ResourceBundle.getBundle("spark-client");
 
     /**
      * 私有化构造器
@@ -38,20 +38,12 @@ public class SparkClient {
     private SparkClient() {
     }
 
-    static {
-        init();
-    }
-
-    ;
-
     /**
      * 获取实例
      */
     public static SparkClient getInstance() {
         return sigle;
     }
-
-    ;
 
     /**
      * 启动SparkApp
@@ -65,13 +57,13 @@ public class SparkClient {
         //这里调用setJavaHome()方法后，JAVA_HOME is not set 错误依然存在
         //SparkAppHandle handle = new SparkLauncher(env)
         SparkLauncher launcher = new SparkLauncher()
-                .setSparkHome(prop.getProperty("sparkHome"))
-                .setAppResource(prop.getProperty("appResource"))
-                .setMainClass(prop.getProperty("mainClass"))
-                .setMaster(prop.getProperty("master"))
-                .setDeployMode(prop.getProperty("deployMode"))
-                .setPropertiesFile(prop.getProperty("propertiesFile"))
-                .setVerbose(Boolean.parseBoolean(prop.getProperty("verbose")))
+                .setSparkHome(resourceBundle.getString("sparkHome"))
+                .setAppResource(resourceBundle.getString("appResource"))
+                .setMainClass(resourceBundle.getString("mainClass"))
+                .setMaster(resourceBundle.getString("master"))
+                .setDeployMode(resourceBundle.getString("deployMode"))
+                .setPropertiesFile(resourceBundle.getString("propertiesFile"))
+                .setVerbose(Boolean.parseBoolean(resourceBundle.getString("verbose")))
                 .addAppArgs(new String[]{json});
 
 
@@ -103,13 +95,5 @@ public class SparkClient {
         countDownLatch.await();
         System.out.println("The task is finished!");
         return handle.getAppId();
-    }
-
-    private static void init() {
-        try (InputStream propFile = SparkClient.class.getResource("../../spark-client.properties").openStream()) {
-            prop.load(new InputStreamReader(propFile, StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            logger.error("spark client init exception");
-        }
     }
 }
